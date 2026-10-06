@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sealed Standard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.95.3/lib/index.iife.min.js"></script>
+<style>
+:root{--bg:#1b1a17;--side:#1f1e1b;--panel:#23221e;--panel2:#2c2b26;--line:#34322c;--ink:#f2efe8;--mut:#a19d93;--good:#a9c49a;--blue:#8fa3d6;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.55 "Inter Tight",system-ui,sans-serif}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.ann{display:flex;align-items:center;gap:10px;padding:8px 18px;background:#141311;font-size:14px}
+.ann i{font-style:italic;font-weight:500}
+.ann a{margin-left:auto;color:var(--mut);text-decoration:none;font-size:13px}
+.app{display:grid;grid-template-columns:250px 1fr}
+.side{background:var(--side);border-right:1px solid var(--line);position:sticky;top:0;height:100dvh;display:flex;flex-direction:column}
+.brand{display:flex;align-items:center;gap:12px;padding:0 22px;height:64px;border-bottom:1px solid var(--line);text-decoration:none}
+.brand svg{width:26px;height:26px}
+.brand b{letter-spacing:.2em;font-weight:600;font-size:14px}
+.nav{padding:12px 8px;display:flex;flex-direction:column;gap:4px}
+.nav a{display:flex;align-items:center;gap:14px;padding:10px 14px;border-radius:6px;text-decoration:none;color:var(--mut);font-size:16px}
+.nav a[aria-current="page"]{background:var(--panel2);color:var(--ink)}
+.nav a span{width:16px;text-align:center}
+.lab{padding:20px 22px 6px;font-size:12px;letter-spacing:.14em;color:var(--mut)}
+.sbot{margin-top:auto;border-top:1px solid var(--line);padding:10px 8px}
+.sbot button{background:none;border:0;display:flex;gap:14px;align-items:center;padding:10px 14px;color:var(--mut);cursor:pointer;width:100%;text-align:left;font-size:15px}
+.top{display:flex;align-items:center;gap:12px;height:64px;padding:0 24px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:5}
+.crumb{color:var(--mut)}.crumb b{color:var(--ink);font-weight:500}
+.sp{flex:1}
+.btn{border:1px solid var(--line);background:var(--panel2);border-radius:6px;padding:9px 16px;cursor:pointer;text-decoration:none;display:inline-flex;gap:8px;align-items:center}
+.btn.pri{background:var(--ink);color:#1b1a17;border-color:var(--ink);font-weight:500}
+.content{max-width:1140px;margin:0 auto;padding:18px 24px 60px}
+.page{display:none}.page.on{display:block}
+.hero{position:relative;overflow:hidden;border-radius:8px;min-height:340px;display:flex;align-items:center;padding:48px 52px}
+.hero .art{position:absolute;inset:0;width:100%;height:100%}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(20,17,30,.78),rgba(20,17,30,.25) 65%,transparent)}
+.hero>div{position:relative;z-index:1;max-width:620px}
+.eye{font-size:12px;letter-spacing:.16em;text-transform:uppercase;font-weight:500;color:#e9e3f3}
+.hero h1{font-size:clamp(40px,6vw,74px);line-height:1;letter-spacing:-.04em;font-weight:500;margin:12px 0 14px}
+.hero p{color:#ddd6e6;margin:0;font-size:17px}
+.strip{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:16px 26px;margin:16px 0}
+.strip a{text-decoration:underline;text-underline-offset:3px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:6px;background:var(--panel)}
+.stats div{padding:22px 26px;border-right:1px solid var(--line);min-width:0}
+.stats div:last-child{border:0}
+.stats small{color:var(--mut);font-size:13px;display:block}
+.stats b{display:block;font-size:30px;font-weight:500;letter-spacing:-.02em;margin:6px 0 2px;overflow-wrap:anywhere}
+.stats span{color:var(--mut);font-size:13px}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:26px}
+.card h3{font-size:26px;font-weight:500;letter-spacing:-.02em;margin:14px 0 8px}
+.card p{color:var(--mut);margin:0 0 16px}
+.card .act{display:flex;justify-content:flex-end;align-items:center;gap:12px}
+.sec{display:flex;align-items:center;gap:18px;margin:34px 0 18px}
+.sec h2{font-size:15px;letter-spacing:.16em;font-weight:500;margin:0;white-space:nowrap}
+.sec::after{content:"";flex:1;height:1px;background:var(--line)}
+.rowl{display:flex;justify-content:space-between;gap:16px;padding:18px 0;border-top:1px solid var(--line)}
+.rowl:first-of-type{border-top:0}
+.rowl span{color:var(--mut)}
+.rowl b{font-weight:500;text-align:right;overflow-wrap:anywhere}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:640px;font-size:14px}
+th,td{text-align:left;padding:10px 12px 10px 0;border-bottom:1px solid var(--line)}
+th{color:var(--mut);font-weight:500;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.flow div{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:20px}
+.flow b{display:block;font-weight:500;margin-bottom:4px}
+.flow span,.mut{color:var(--mut);font-size:14px}
+.model{display:grid;grid-template-columns:1fr 1.4fr;gap:20px}
+.ctrls{display:flex;flex-direction:column;gap:14px}
+.ctrls label{display:flex;flex-direction:column;gap:6px;color:var(--mut);font-size:13px;position:relative}
+.ctrls output{position:absolute;right:0;top:0;color:var(--ink)}
+.ctrls input{accent-color:var(--good);padding:0}
+.big{font-size:40px;font-weight:500;letter-spacing:-.03em;line-height:1.1;margin:6px 0 0;color:var(--good)}
+.big small{display:block;font-size:14px;color:var(--mut);letter-spacing:0;margin-top:6px}
+#mChart{width:100%;height:auto}
+.tools{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:18px 0}
+.tab{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:7px 14px;color:var(--mut);cursor:pointer}
+.tab[aria-pressed="true"]{color:var(--ink);background:#3a3832}
+select{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:7px 12px;font:inherit}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.pc{background:var(--panel);border:1px solid var(--line);border-radius:6px;display:flex;flex-direction:column;overflow:hidden}
+.stage{background:radial-gradient(circle at 50% 30%,#35332c,var(--panel));height:200px;display:grid;place-items:center;perspective:700px;cursor:grab;touch-action:pan-y}
+.pb{padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
+.pb h4{margin:0;font-weight:500;font-size:16px;line-height:1.3}
+.pb .k{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
+.pr{font-size:13px;color:var(--good)}.pr.o{color:#e0b07a}
+.pb .bot{display:flex;justify-content:space-between;align-items:end;margin-top:auto;gap:8px}
+.price{font-size:18px;font-weight:500}
+.box{position:relative;width:var(--w);height:var(--h);transform-style:preserve-3d;transform:rotateX(var(--rx,-14deg)) rotateY(var(--ry,-28deg))}
+.f{position:absolute;backface-visibility:hidden;overflow:hidden;display:flex;align-items:center;justify-content:center;text-align:center;color:#fff;font-weight:600}
+.f.fr{width:var(--w);height:var(--h);transform:translateZ(calc(var(--d)/2));background:linear-gradient(160deg,var(--c),color-mix(in srgb,var(--c) 55%,#000))}
+.f.bk{width:var(--w);height:var(--h);transform:rotateY(180deg) translateZ(calc(var(--d)/2));background:color-mix(in srgb,var(--c) 60%,#000)}
+.f.rt,.f.lf{width:var(--d);height:var(--h);left:calc((var(--w) - var(--d))/2);background:color-mix(in srgb,var(--c) 70%,#000);font-size:calc(var(--w)/16)}
+.f.rt{transform:rotateY(90deg) translateZ(calc(var(--w)/2))}
+.f.lf{transform:rotateY(-90deg) translateZ(calc(var(--w)/2))}
+.f.tp,.f.bt{width:var(--w);height:var(--d);top:calc((var(--h) - var(--d))/2);background:color-mix(in srgb,var(--c) 80%,#fff)}
+.f.tp{transform:rotateX(90deg) translateZ(calc(var(--h)/2))}
+.f.bt{transform:rotateX(-90deg) translateZ(calc(var(--h)/2));background:color-mix(in srgb,var(--c) 40%,#000)}
+.f.fr::after,.f.tp::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,rgba(255,255,255,.28),transparent 35%,rgba(255,255,255,.08) 70%,transparent)}
+.band{position:absolute;top:0;left:0;right:0;height:22%;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;font-size:calc(var(--w)/14);padding:0 6px;line-height:1.1}
+.tape{position:absolute;left:-10%;right:-10%;top:62%;height:13%;background:#f2efe8;color:#1b1a17;font-size:calc(var(--w)/17);letter-spacing:.14em;display:flex;align-items:center;justify-content:center;transform:rotate(-9deg);white-space:nowrap}
+.foot{position:absolute;bottom:5%;left:0;right:0;font-size:calc(var(--w)/20);opacity:.85;letter-spacing:.08em}
+dialog{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:0;width:min(900px,94vw);max-height:92vh;overflow:auto}
+dialog::backdrop{background:rgba(0,0,0,.65)}
+.dg{display:grid;grid-template-columns:1.2fr 1fr}
+.bigst{background:radial-gradient(circle at 50% 40%,#35332c,var(--panel));min-height:380px;display:grid;place-items:center;perspective:1100px;cursor:grab;touch-action:none}
+.di{padding:24px;display:flex;flex-direction:column;gap:12px}
+.di h2{margin:0;font-weight:500;font-size:28px;letter-spacing:-.02em}
+.di p{margin:0;color:var(--mut)}
+.wl{display:flex;flex-direction:column;gap:8px;padding:0 22px 22px}
+.wl button{display:flex;align-items:center;gap:12px;background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:12px 14px;cursor:pointer;text-align:left}
+.wl img{width:28px;height:28px;border-radius:6px}
+.dh{display:flex;justify-content:space-between;align-items:center;padding:18px 22px}
+.dh h3{margin:0;font-weight:500}
+#wmenu{position:absolute;right:24px;top:58px;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px;min-width:200px;z-index:9}
+#wmenu button{display:block;width:100%;background:none;border:0;padding:9px 12px;text-align:left;cursor:pointer;border-radius:4px}
+#wmenu button:hover{background:var(--panel2)}
+.disc{padding:0 22px 22px;color:var(--mut)}
+.disc li{margin:6px 0}
+@media(max-width:900px){.app{grid-template-columns:1fr}.side{position:static;height:auto}.nav{flex-direction:row;overflow-x:auto}.lab,.sbot,.brand{display:none}.stats,.flow{grid-template-columns:1fr 1fr}.stats div:nth-child(2){border-right:0}.duo,.model,.dg{grid-template-columns:1fr}.hero{padding:34px 26px;min-height:280px}}
+@media(max-width:480px){.stats,.flow{grid-template-columns:1fr}.stats div{border-right:0;border-bottom:1px solid var(--line)}.crumb{display:none}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="mark" viewBox="0 0 100 100"><path d="M50 6L88 26L50 46L12 26Z" fill="currentColor"/><path d="M12 26L50 46L50 94L12 74Z" fill="currentColor"/><path d="M50 46L88 26L88 74L50 94Z" fill="currentColor"/><path d="M12 26L50 46L88 26M50 46V94" fill="none" stroke="var(--side)" stroke-width="3"/><path d="M12 54L50 74L88 54V62L50 82L12 62Z" fill="var(--side)"/></symbol></svg>
+
+<div class="ann"><svg width="16" height="16"><use href="#mark"/></svg><i>Only sealed. Never ripped.</i><a href="#/protocol">How the treasury works →</a></div>
+<div class="app">
+<aside class="side">
+  <a class="brand" href="#/"><svg><use href="#mark"/></svg><b>SEALED STANDARD</b></a>
+  <nav class="nav" id="nav">
+    <a href="#/" data-p="home"><span>◎</span>Home</a>
+    <a href="#/treasury" data-p="treasury"><span>▥</span>Treasury</a>
+    <a href="#/catalog" data-p="catalog"><span>◆</span>Catalog</a>
+    <a href="#/supply" data-p="supply"><span>≈</span>Supply</a>
+    <a href="#/economics" data-p="economics"><span>△</span>Economics</a>
+    <a href="#/protocol" data-p="protocol"><span>▯</span>Protocol</a>
+  </nav>
+  <div class="lab" id="infoLab">INFORMATION</div>
+  <nav class="nav" style="padding-top:0"><a id="twLink" href="#" target="_blank" rel="noopener" hidden><span>𝕏</span>Twitter ↗</a></nav>
+  <div class="sbot"><button id="discBtn"><span>ⓘ</span>Disclaimer</button></div>
+</aside>
+<div>
+  <header class="top">
+    <div class="crumb">Sealed Standard / <b id="crumb">Home</b></div>
+    <div class="sp"></div>
+    <button class="btn pri" id="wbtn">Connect wallet</button>
+    <div id="wmenu" hidden><button id="wcopy">Copy address</button><button id="wdis">Disconnect</button></div>
+  </header>
+  <div class="content">
+
+  <div class="page" id="p-home">
+    <div class="hero" id="h-home"><div>
+      <div class="eye">Sealed Standard · Treasury token</div>
+      <h1>Only sealed. Never ripped.</h1>
+      <p>As of <span id="today"></span>.</p>
+    </div></div>
+    <div class="strip"><span>$SEALED fees fund a treasury of out-of-print, factory-sealed Pokémon, held unopened.</span><a href="#/treasury">View the treasury ↗</a></div>
+    <div class="stats" id="stats"></div>
+    <div class="duo">
+      <div class="card"><div class="eye" style="color:var(--mut)">Get started</div><h3>Connect your wallet.</h3><p id="wcard">Connect Phantom or another Solana wallet to see your $SEALED position.</p><div class="act"><button class="btn pri" id="wbtn2">Connect →</button></div></div>
+      <div class="card"><div class="eye" style="color:var(--mut)">Catalog</div><h3>See what qualifies.</h3><p>Out-of-print sealed product the treasury screens for, in 3D.</p><div class="act"><a class="btn" href="#/catalog">View →</a></div></div>
+    </div>
+  </div>
+
+  <div class="page" id="p-treasury">
+    <div class="hero" id="h-treasury" style="min-height:260px"><div>
+      <div class="eye">Treasury · Balance sheet</div>
+      <h1>What the treasury holds.</h1>
+      <p>Every unit, serial and proof, listed in public.</p>
+    </div></div>
+    <div class="sec"><h2>RESERVE LEDGER</h2></div>
+    <div class="duo" style="grid-template-columns:1.6fr 1fr;margin:0">
+      <div class="card"><h3 style="margin-top:0">Balance sheet</h3><div id="sheet"></div></div>
+      <div class="card"><div class="eye" style="color:var(--mut)">The policy</div><h3>Buy rules and signers.</h3><p>What the treasury can buy, who signs, and when anything can be sold.</p><div class="act" id="polAct"></div></div>
+    </div>
+    <div id="holdWrap" hidden><div class="sec"><h2>HOLDINGS</h2></div><div class="card tw" id="holdings"></div></div>
+  </div>
+
+  <div class="page" id="p-catalog">
+    <div class="hero" id="h-catalog" style="min-height:240px"><div>
+      <div class="eye">Catalog · Out of print</div>
+      <h1>The stuff that survives.</h1>
+      <p>Drag any box to turn it over. Reference prices are third-party figures.</p>
+    </div></div>
+    <div class="tools">
+      <button class="tab" data-t="all" aria-pressed="true">All</button><button class="tab" data-t="Vintage" aria-pressed="false">Vintage</button><button class="tab" data-t="2010s" aria-pressed="false">2010s</button><button class="tab" data-t="Modern" aria-pressed="false">Modern</button><button class="tab" data-t="Watchlist" aria-pressed="false">Reprint risk</button>
+      <span class="sp"></span>
+      <select id="sort" aria-label="Sort"><option value="hi">Price: high to low</option><option value="lo">Price: low to high</option><option value="az">Name: A to Z</option></select>
+    </div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div class="page" id="p-supply">
+    <div class="hero" id="h-supply" style="min-height:240px"><div>
+      <div class="eye">Supply · One direction</div>
+      <h1>Supply only goes down.</h1>
+      <p>Opened boxes can't be resealed, and closed print runs add nothing.</p>
+    </div></div>
+    <div class="sec"><h2>MODEL IT</h2></div>
+    <div class="card model">
+      <div class="ctrls">
+        <label>Sealed units left today<output id="oU"></output><input id="mU" type="range" min="1000" max="100000" step="1000" value="20000"></label>
+        <label>Lost or opened each year<output id="oA"></output><input id="mA" type="range" min="0.5" max="10" step="0.5" value="3"></label>
+        <label>Years from now<output id="oY"></output><input id="mY" type="range" min="0" max="30" step="1" value="10"></label>
+        <p class="big" id="mOut"></p>
+      </div>
+      <svg id="mChart" viewBox="0 0 600 240" role="img" aria-label="Sealed supply falling over time"></svg>
+    </div>
+    <p class="mut" style="margin-top:10px">Example inputs. Real unit counts for these products aren't published. Lower supply only matters if demand holds.</p>
+    <div class="sec"><h2>WHAT CAN BREAK IT</h2></div>
+    <div class="flow" style="grid-template-columns:repeat(3,1fr)">
+      <div><b>Reprints</b><span>A new print run adds sealed units. Recent sets are most exposed.</span></div>
+      <div><b>Warehouse finds</b><span>Old stock can surface and add supply nobody counted.</span></div>
+      <div><b>Resealed fakes</b><span>They look like new supply and distort prices.</span></div>
+    </div>
+  </div>
+
+  <div class="page" id="p-economics">
+    <div class="hero" id="h-economics" style="min-height:240px"><div>
+      <div class="eye">Economics · Sealed as an asset</div>
+      <h1>The case for sealed.</h1>
+      <p>Why unopened product behaves differently from cards, and what can go wrong.</p>
+    </div></div>
+    <div class="sec"><h2>SUPPLY</h2></div>
+    <div class="flow" style="grid-template-columns:repeat(3,1fr)">
+      <div><b>Fixed, then falling</b><span>A print run ends and no more of that product is made. From then on the sealed count can only shrink.</span></div>
+      <div><b>Opening is permanent</b><span>Every box opened for its cards leaves the sealed pool for good. Ripping on stream turns supply into content.</span></div>
+      <div><b>Attrition adds up</b><span>Damage, loss and poor storage remove more units every year, mostly unseen.</span></div>
+    </div>
+    <div class="sec"><h2>DEMAND</h2></div>
+    <div class="flow" style="grid-template-columns:repeat(3,1fr)">
+      <div><b>Nostalgia with income</b><span>Kids who opened packs in 1999 and 2016 are now adults with money, and they buy back what they remember.</span></div>
+      <div><b>A living game</b><span>Pokémon is still the biggest trading card game, so new collectors keep discovering old sets.</span></div>
+      <div><b>Openers compete with holders</b><span>People who want the cards inside buy boxes to open them, which pulls supply out of the market.</span></div>
+    </div>
+    <div class="sec"><h2>WHAT "DEFLATIONARY" MEANS HERE</h2></div>
+    <div class="card"><p style="margin:0">The number of sealed units deflates, and that part is mechanical. Price is a different question: it rises only when demand grows faster than supply falls. Vintage boxes show what that looks like at the top. A Skyridge box sold for $212,500 and an Expedition box for $112,500 at auction in June 2026. Modern sets like Evolving Skies now trade far above their release price. But not every set has done that, and prices fell hard after the 2021 boom.</p></div>
+    <div class="sec"><h2>A REAL MARKET</h2></div>
+    <div class="duo" style="margin:0">
+      <div class="card"><h3 style="margin-top:0">What makes it one</h3><p>Physical, finite products with major auction houses, public sales records, daily price trackers, and authentication services. It is a collectibles market like sports cards, comics and watches, and it is global.</p></div>
+      <div class="card"><h3 style="margin-top:0">What it isn't</h3><p>Sealed product pays no income, costs money to store and insure, and can take months to sell at a fair price. Values are estimates between sales.</p></div>
+    </div>
+    <div class="sec"><h2>WHAT WORKS AGAINST IT</h2></div>
+    <div class="flow">
+      <div><b>Reprints</b><span>A new print run resets scarcity for that product.</span></div>
+      <div><b>Fakes</b><span>Resealed boxes are common, so authentication is essential.</span></div>
+      <div><b>Fads</b><span>Hype cycles inflate and deflate prices quickly.</span></div>
+      <div><b>Liquidity</b><span>Few buyers at the top end means wide spreads.</span></div>
+    </div>
+  </div>
+
+  <div class="page" id="p-protocol">
+    <div class="hero" id="h-protocol" style="min-height:240px"><div>
+      <div class="eye">Protocol · The mechanics</div>
+      <h1>Fees in. Sealed out.</h1>
+      <p>A treasury token for unopened Pokémon.</p>
+    </div></div>
+    <div class="sec"><h2>HOW IT WORKS</h2></div>
+    <div class="flow">
+      <div><b>1. Trading</b><span>$SEALED trades and earns creator fees.</span></div>
+      <div><b>2. Treasury</b><span>A set share goes to the multisig treasury.</span></div>
+      <div><b>3. Purchase</b><span>Only screened, authenticated, out-of-print sealed product.</span></div>
+      <div><b>4. Vault</b><span>Held unopened in insured custody, listed on the ledger.</span></div>
+    </div>
+    <div class="sec"><h2>SOURCING</h2></div>
+    <div class="flow">
+      <div><b>Auction houses</b><span>Major collectibles auctions with public results and provenance.</span></div>
+      <div><b>Established dealers</b><span>Specialist sealed dealers with a long record and return policies.</span></div>
+      <div><b>Private collections</b><span>Direct purchases, checked for provenance before payment.</span></div>
+      <div><b>Authenticated marketplaces</b><span>Platforms that vault and verify product before it changes hands.</span></div>
+    </div>
+    <p class="mut" style="margin-top:10px">Every purchase needs provenance and authentication before it joins the treasury, whatever the source.</p>
+    <div class="sec"><h2>CAPITAL FLOW</h2></div>
+    <div class="card model">
+      <div class="ctrls">
+        <label>Daily trading volume<output id="oV"></output><input id="fV" type="range" min="1000" max="1000000" step="1000" value="50000"></label>
+        <label>Fee on each trade<output id="oF"></output><input id="fF" type="range" min="0.25" max="2" step="0.25" value="1"></label>
+        <label>Share sent to treasury<output id="oS"></output><input id="fS" type="range" min="10" max="100" step="10" value="50"></label>
+      </div>
+      <div><p class="big" id="fOut"></p><p class="mut" style="margin-top:12px">At catalog reference prices, before spreads, authentication, shipping, insurance and storage. Fee income follows trading volume.</p></div>
+    </div>
+    <div class="sec"><h2>THE TREASURY-TOKEN MODEL</h2></div>
+    <div class="duo" style="margin:0">
+      <div class="card"><h3 style="margin-top:0">The idea</h3><p>Strategy (MSTR) put Bitcoin on its balance sheet and became the public way to follow it. $SEALED applies the treasury idea to sealed Pokémon: fees in, scarce product held, everything published.</p></div>
+      <div class="card"><h3 style="margin-top:0">The difference</h3><p>MSTR is a listed company. Its shareholders own equity, with legal rights and audited filings. $SEALED holders don't own the treasury, can't redeem tokens for product, and have no claim on the boxes. The token's price is set by the market.</p></div>
+    </div>
+  </div>
+  </div>
+</div>
+</div>
+
+<dialog id="dlg" aria-label="Product detail"><div class="dg">
+  <div class="bigst" id="bigStage"></div>
+  <div class="di">
+    <button class="tab" id="closeBtn" style="align-self:flex-end">Close</button>
+    <div class="k eye" style="color:var(--mut)" id="dTag"></div><h2 id="dName"></h2>
+    <div><span class="mut">Reference price</span><div class="price" id="dPrice" style="font-size:26px"></div><span class="mut" id="dSrc"></span></div>
+    <p id="dWhy"></p><p id="dPrint" style="color:var(--ink)"></p>
+    <div style="display:flex;gap:6px"><button class="tab" id="dSpin" aria-pressed="false">Auto-rotate</button><button class="tab" id="dReset">Reset view</button></div>
+  </div>
+</div></dialog>
+
+<dialog id="wdlg" aria-label="Connect a wallet" style="width:min(420px,94vw)">
+  <div class="dh"><h3>Connect a wallet</h3><button class="tab" id="wclose">Close</button></div>
+  <div class="wl" id="wlist"></div>
+</dialog>
+
+<dialog id="ddlg" aria-label="Disclaimer" style="width:min(620px,94vw)">
+  <div class="dh"><h3>Disclaimer</h3><button class="tab" id="dclose">Close</button></div>
+  <ul class="disc">
+    <li>$SEALED is a crypto token. Its price can fall to zero.</li>
+    <li>Holding $SEALED gives no ownership of, claim on, or right to redeem any treasury product.</li>
+    <li>Treasury purchases depend on trading fees, which depend on volume. Nothing guarantees either.</li>
+    <li>Collectibles are illiquid and prices are estimates. Reprints, fakes and damage can reduce value.</li>
+    <li>Reference prices are third-party figures from public sources, not offers to buy or sell.</li>
+    <li>Nothing on this site is investment, legal, or tax advice.</li>
+    <li>Fan project. Not affiliated with or endorsed by Nintendo, Game Freak, Creatures, or The Pokémon Company.</li>
+  </ul>
+</dialog>
+
+<script>
+/* ===== CONFIG: fill in real values. Empty fields are hidden. =====
+   holdings: {name,serial,auth,cost,date,proofUrl}
+   items (catalog) can take img:{fr,bk,lf,rt,tp,bt} as data: image URIs, and dim:[h/w, d/w] */
+var CONFIG={
+ token:{mint:"",supply:""},
+ rpc:"https://api.mainnet-beta.solana.com",
+ explorer:"https://solscan.io/account/",
+ links:{twitter:"https://x.com/SealedStandard"},
+ treasury:{address:"G9YmHjoeaUNji7YYybtRSTRywM8kq2VEHqsE6khX2FSg",signers:[],threshold:0,policyUrl:""},
+ custody:{vault:"",insurer:"",auditor:"",lastAudit:"",auditUrl:""},
+ holdings:[]
+};
+var items=[
+{n:"Skyridge Booster Box",s:"Skyridge",t:"Vintage",p:212500,l:"$212,500",k:"Auction, Jun 2026",c:"#2b6cb0",w:"The last WotC-era set and the scarcest English box."},
+{n:"Japanese Base Set Box (1996)",s:"Base Set JP",t:"Vintage",p:137500,l:"$137,500",k:"Auction, 2026",c:"#c53030",w:"The first print run of the game."},
+{n:"Expedition Booster Box",s:"Expedition",t:"Vintage",p:112500,l:"$112,500",k:"Auction, Jun 2026",c:"#2f855a",w:"First e-Reader set with very low survival."},
+{n:"Neo Destiny Unlimited Box",s:"Neo Destiny",t:"Vintage",p:60000,l:"$60,000",k:"Auction, Jun 2026",c:"#b7791f",w:"The Unlimited run is priced apart from 1st Edition."},
+{n:"Legendary Treasures Box",s:"Legendary Treasures",t:"2010s",p:18750,l:"$18,750",k:"Listed price",c:"#805ad5",w:"Low print run and light demand at release."},
+{n:"Plasma Freeze Box",s:"Plasma Freeze",t:"2010s",p:14999,l:"$14,999",k:"Listed price",c:"#2c7a7b",w:"Late Black and White set with few sealed boxes left."},
+{n:"Evolving Skies Booster Box",s:"Evolving Skies",t:"Modern",p:2500,l:"$2,375 to $2,650",k:"Reported range",c:"#4a5568",w:"Eeveelution alt arts. The chase card trades near the box price."},
+{n:"Brilliant Stars Booster Box",s:"Brilliant Stars",t:"Modern",p:590,l:"$500 to $680",k:"Reported range",c:"#d69e2e",w:"V-STAR and Trainer Gallery, drying up at retail."},
+{n:"Silver Tempest Booster Box",s:"Silver Tempest",t:"Modern",p:480,l:"$400 to $560",k:"Reported range",c:"#3182ce",w:"Home of the Lugia V alternate art."},
+{n:"Charizard Ultra Premium Collection",s:"Charizard UPC",t:"Modern",p:460,l:"$380 to $540",k:"Reported range",c:"#dd6b20",w:"Limited run with no reprint so far."},
+{n:"Hidden Fates ETB",s:"Hidden Fates",t:"Modern",p:395,l:"$200 to $590",k:"Sources conflict",c:"#6b46c1",w:"The Shiny Vault set."},
+{n:"Crown Zenith ETB",s:"Crown Zenith",t:"Modern",p:230,l:"$210 to $250",k:"Reported range",c:"#718096",w:"The Sword and Shield finale."},
+{n:"Pokémon 151 Box (Japanese)",s:"Pokémon 151",t:"Modern",p:215,l:"$210 to $220",k:"Reported range",c:"#e53e3e",w:"Generation One nostalgia."},
+{n:"Champion's Path ETB",s:"Champion's Path",t:"Modern",p:160,l:"$130 to $190",k:"Reported range",c:"#38a169",w:"Small British-themed set with the Charizard VMAX."},
+{n:"Prismatic Evolutions ETB",s:"Prismatic Evolutions",t:"Watchlist",p:105,l:"$60 to $150",k:"Reprint risk",c:"#d53f8c",w:"High buzz but the highest reprint risk. Tracked, not core."},
+{n:"Base Set 1st Edition Booster Box",s:"Base Set 1st Ed",t:"Vintage",p:0,l:"Reference pending",k:"Rarely trades",c:"#9b2c2c",w:"The first English print. The benchmark for vintage sealed."},
+{n:"Jungle Booster Box",s:"Jungle",t:"Vintage",p:0,l:"Reference pending",k:"Not yet priced",c:"#276749",w:"Second English set, in 1st Edition and Unlimited."},
+{n:"Fossil Booster Box",s:"Fossil",t:"Vintage",p:0,l:"Reference pending",k:"Not yet priced",c:"#744210",w:"Third English set, from the original Wizards run."},
+{n:"Team Rocket Booster Box",s:"Team Rocket",t:"Vintage",p:0,l:"Reference pending",k:"Not yet priced",c:"#1a202c",w:"Dark Pokémon debut, smaller print than Base."},
+{n:"Gym Heroes Booster Box",s:"Gym Heroes",t:"Vintage",p:10000,l:"About $10,000",k:"Listed price",c:"#975a16",w:"Gym Leader era, lower print than the first sets."},
+{n:"Gym Challenge Booster Box",s:"Gym Challenge",t:"Vintage",p:0,l:"Reference pending",k:"Not yet priced",c:"#553c9a",w:"Gym Leader era finale."},
+{n:"Base Set 2 Booster Box",s:"Base Set 2",t:"Vintage",p:10000,l:"About $10,000",k:"Listed price",c:"#c05621",w:"Reprint compilation with a short run."},
+{n:"Neo Genesis Booster Box",s:"Neo Genesis",t:"Vintage",p:0,l:"Reference pending",k:"Not yet priced",c:"#2c5282",w:"Generation Two debut."},
+{n:"Legendary Collection Booster Box",s:"Legendary Collection",t:"Vintage",p:0,l:"Reference pending",k:"Not yet priced",c:"#702459",w:"Reverse-holo fireworks set."},
+{n:"Aquapolis Booster Box",s:"Aquapolis",t:"Vintage",p:0,l:"Reference pending",k:"Not yet priced",c:"#285e61",w:"e-Reader era, very low survival."},
+{n:"Team Up Booster Box",s:"Team Up",t:"2010s",p:11725,l:"$11,725",k:"Listed price",c:"#4c51bf",w:"Sun and Moon set with Tag Team alt arts."},
+{n:"XY Evolutions Booster Box Case",s:"XY Evolutions",t:"2010s",p:15444,l:"$15,444",k:"Listed price, case",c:"#b83280",w:"Base Set homage set."},
+{n:"Celebrations Elite Trainer Box",s:"Celebrations",t:"Modern",p:240,l:"€200 to €250",k:"Reported range",c:"#d69e2e",w:"25th anniversary, one-time set."},
+{n:"Shining Fates Elite Trainer Box",s:"Shining Fates",t:"Modern",p:0,l:"Reference pending",k:"Not yet priced",c:"#2b6cb0",w:"Shiny Vault special set."},
+{n:"Lost Origin Booster Box",s:"Lost Origin",t:"Modern",p:0,l:"Reference pending",k:"Not yet priced",c:"#4a5568",w:"Giratina V alternate art."},
+{n:"Fusion Strike Booster Box",s:"Fusion Strike",t:"Modern",p:0,l:"Reference pending",k:"Not yet priced",c:"#9c4221",w:"Largest Sword and Shield set, Gengar VMAX alt art."},
+{n:"Paldea Evolved Booster Box",s:"Paldea Evolved",t:"Modern",p:0,l:"Reference pending",k:"Not yet priced",c:"#2f855a",w:"Early Scarlet and Violet set."},
+{n:"Paldean Fates ETB Case",s:"Paldean Fates",t:"Modern",p:9000,l:"About $9,000",k:"Listed price, case",c:"#805ad5",w:"Shiny special set, sealed case."},
+{n:"Pokémon 151 Elite Trainer Box",s:"Pokémon 151",t:"Modern",p:0,l:"Reference pending",k:"Not yet priced",c:"#c53030",w:"English Generation One set."}
+];
+var $=function(i){return document.getElementById(i)},reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+function esc(s){return String(s).replace(/[&<>"']/g,function(m){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]})}
+function safeUrl(u){return /^https?:\/\//i.test(u||"")?u:""}
+function lnk(t,u){u=safeUrl(u);return u?'<a href="'+esc(u)+'" target="_blank" rel="noopener">'+esc(t)+'</a>':esc(t)}
+function usd(n){return "$"+Math.round(n).toLocaleString("en-US")}
+function short(a){return a.slice(0,4)+"…"+a.slice(-4)}
+
+/* ---- generated skyline of stacked sealed boxes ---- */
+function rnd(s){return function(){s=(s*9301+49297)%233280;return s/233280}}
+function heroArt(seed){var r=rnd(seed),o='<svg class="art" viewBox="0 0 1200 420" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="sk'+seed+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#211b38"/><stop offset=".55" stop-color="#5f4680"/><stop offset="1" stop-color="#d49a7c"/></linearGradient><linearGradient id="fg'+seed+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a2238" stop-opacity="0"/><stop offset="1" stop-color="#1b1a17" stop-opacity=".95"/></linearGradient></defs><rect width="1200" height="420" fill="url(#sk'+seed+')"/><circle cx="'+(620+r()*420)+'" cy="290" r="200" fill="#f4caa6" opacity=".22"/>';
+ [{c:"#4b3c6c",op:.6,a:110,b:290,s:.7},{c:"#1a1629",op:.96,a:150,b:390,s:1}].forEach(function(L){var x=-30+r()*40;
+  while(x<1230){var w=(55+r()*95)*L.s,h=L.a+r()*(L.b-L.a),n=Math.max(2,Math.round(h/(w*.6))),bh=h/n,j;
+   for(j=0;j<n;j++){var y=420-(j+1)*bh,ins=j*w*.05;
+    o+='<rect x="'+(x+ins).toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+(w-2*ins).toFixed(1)+'" height="'+(bh-3).toFixed(1)+'" fill="'+L.c+'" opacity="'+L.op+'"/><rect x="'+(x+ins).toFixed(1)+'" y="'+(y+bh*.56).toFixed(1)+'" width="'+(w-2*ins).toFixed(1)+'" height="3" fill="#f2efe8" opacity=".14"/>';
+    if(r()<.22)o+='<rect x="'+(x+ins+r()*(w-2*ins-8)).toFixed(1)+'" y="'+(y+bh*.25).toFixed(1)+'" width="6" height="8" fill="#f5b46a" opacity=".75"/>'}
+   x+=w+10+r()*46}});
+ return o+'<rect y="250" width="1200" height="170" fill="url(#fg'+seed+')"/></svg>'}
+["home","treasury","catalog","supply","economics","protocol"].forEach(function(p,i){$("h-"+p).insertAdjacentHTML("afterbegin",heroArt(17+i*53))});
+$("today").textContent=new Date().toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"});
+
+/* ---- 3D boxes with optional photo faces ---- */
+function gray(h){var n=parseInt(h.slice(1),16),l=Math.round(.3*(n>>16)+.59*((n>>8)&255)+.11*(n&255));l=Math.max(70,Math.min(190,l));return "rgb("+l+","+l+","+l+")"}
+function tex(u){return /^(data:image\/(png|jpe?g|webp);base64,|https?:\/\/)[^"'()\s]+$/i.test(u||"")?u:""}
+function fs(i,k){var u=i.img&&tex(i.img[k]);return u?' style="background:url(\''+u+'\') center/100% 100% no-repeat"':''}
+function box(i,w){var dm=i.dim||[.62,.4],h=Math.round(w*dm[0]),d=Math.round(w*dm[1]),fr=fs(i,"fr"),bk=fs(i,"bk"),lf=fs(i,"lf"),rt=fs(i,"rt");
+ return '<div class="box" style="--w:'+w+'px;--h:'+h+'px;--d:'+d+'px;--c:'+gray(i.c)+'"><div class="f fr"'+fr+'>'+(fr?'':'<div class="band">'+esc(i.s)+'</div><div class="tape">DO NOT RIP</div><div class="foot">FACTORY SEALED</div>')+'</div><div class="f bk"'+bk+'>'+(bk?'':esc(i.s))+'</div><div class="f rt"'+rt+'>'+(rt?'':esc(i.s))+'</div><div class="f lf"'+lf+'>'+(lf?'':esc(i.s))+'</div><div class="f tp"'+fs(i,"tp")+'></div><div class="f bt"'+fs(i,"bt")+'></div></div>'}
+function drag(stage,o){var b=stage.querySelector(".box"),ry=-28,rx=-14,dn=false,lx=0,ly=0,sp=false,raf=0;
+ function ap(){b.style.setProperty("--ry",ry+"deg");b.style.setProperty("--rx",rx+"deg")}
+ stage.addEventListener("pointerdown",function(e){dn=true;lx=e.clientX;ly=e.clientY;try{stage.setPointerCapture(e.pointerId)}catch(x){}});
+ stage.addEventListener("pointermove",function(e){if(dn){ry+=(e.clientX-lx)*.6;rx=Math.max(-80,Math.min(80,rx-(e.clientY-ly)*.4));lx=e.clientX;ly=e.clientY;ap()}else if(o.hover&&!reduce){var r=stage.getBoundingClientRect();ry=-28+((e.clientX-r.left)/r.width-.5)*50;rx=-14-((e.clientY-r.top)/r.height-.5)*30;ap()}});
+ function up(){dn=false}stage.addEventListener("pointerup",up);stage.addEventListener("pointercancel",up);
+ if(o.hover)stage.addEventListener("pointerleave",function(){if(!dn){ry=-28;rx=-14;ap()}});
+ function tick(){if(sp&&!dn){ry+=.5;ap()}raf=requestAnimationFrame(tick)}
+ return{spin:function(v){sp=v&&!reduce;if(sp&&!raf)tick()},reset:function(){ry=-28;rx=-14;ap()},stop:function(){cancelAnimationFrame(raf);raf=0}}}
+
+/* ---- catalog ---- */
+var st={t:"all",s:"hi"},ctl=null;
+function grid(){var r=items.filter(function(i){return st.t==="all"||i.t===st.t}).sort(function(a,b){return st.s==="hi"?b.p-a.p:st.s==="lo"?a.p-b.p:a.n.localeCompare(b.n)});
+ $("grid").innerHTML=r.map(function(i){var w=i.t==="Watchlist";return '<article class="pc" data-n="'+esc(i.n)+'"><div class="stage">'+box(i,150)+'</div><div class="pb"><span class="k">'+(w?"Reprint risk":esc(i.t))+'</span><h4>'+esc(i.n)+'</h4><span class="pr'+(w?' o':'')+'">'+(w?"Reprints can still add supply":"↓ Closed print run")+'</span><div class="bot"><div><span class="mut">Reference</span><div class="price">'+esc(i.l)+'</div></div><button class="btn view">View</button></div></div></article>'}).join("");
+ [].forEach.call($("grid").querySelectorAll(".pc"),function(c){var it=items.filter(function(x){return x.n===c.dataset.n})[0];drag(c.querySelector(".stage"),{hover:true});c.querySelector(".view").addEventListener("click",function(){openD(it)})})}
+function openD(i){$("bigStage").innerHTML=box(i,300);if(ctl)ctl.stop();ctl=drag($("bigStage"),{});var w=i.t==="Watchlist";
+ $("dTag").textContent=w?"Reprint risk":i.t;$("dName").textContent=i.n;$("dPrice").textContent=i.l;$("dSrc").textContent=i.k;$("dWhy").textContent=i.w;
+ $("dPrint").textContent=w?"Reprints can still add supply, so scarcity isn't guaranteed.":"Out of print. No new sealed units are being made.";$("dSpin").setAttribute("aria-pressed","false");$("dlg").showModal()}
+$("dSpin").addEventListener("click",function(e){var v=e.target.getAttribute("aria-pressed")!=="true";e.target.setAttribute("aria-pressed",v);ctl.spin(v)});
+$("dReset").addEventListener("click",function(){ctl.reset()});$("closeBtn").addEventListener("click",function(){$("dlg").close()});
+$("dlg").addEventListener("close",function(){if(ctl)ctl.stop()});
+[].forEach.call(document.querySelectorAll("[data-t]"),function(b){b.addEventListener("click",function(){st.t=b.dataset.t;[].forEach.call(document.querySelectorAll("[data-t]"),function(x){x.setAttribute("aria-pressed",x===b)});grid()})});
+$("sort").addEventListener("change",function(e){st.s=e.target.value;grid()});
+
+/* ---- treasury ---- */
+function treasury(){var c=CONFIG,t=c.treasury,cu=c.custody,h=c.holdings||[],cost=0;h.forEach(function(x){cost+=+x.cost||0});
+ function stat(l,v,s){return '<div><small>'+l+'</small><b>'+v+'</b><span>'+s+'</span></div>'}
+ $("stats").innerHTML=stat("Sealed units held",h.length,"factory-sealed, in custody")+stat("Treasury cost basis",usd(cost),"paid for sealed product")+stat("Products tracked",items.length,"out-of-print and watchlist")+stat("Treasury wallet",t.address?lnk(short(t.address),c.explorer+t.address):"—","public multisig");
+ var rows=[["Sealed units",h.length],["Cost basis",usd(cost)]];
+ if(t.address)rows.push(["Treasury wallet",lnk(short(t.address),c.explorer+t.address)]);
+ if(t.signers&&t.signers.length)rows.push(["Signers",esc((t.threshold||"?")+" of "+t.signers.length+": "+t.signers.join(", "))]);
+ if(cu.vault||cu.insurer)rows.push(["Custody",esc([cu.vault,cu.insurer&&("insured by "+cu.insurer)].filter(Boolean).join(", "))]);
+ if(cu.auditor)rows.push(["Audit",esc(cu.auditor+(cu.lastAudit?", "+cu.lastAudit:""))+(cu.auditUrl?" · "+lnk("report",cu.auditUrl):"")]);
+ if(c.token.supply)rows.push(["$SEALED supply",Number(c.token.supply).toLocaleString("en-US")]);
+ $("sheet").innerHTML=rows.map(function(r){return '<div class="rowl"><span>'+r[0]+'</span><b>'+r[1]+'</b></div>'}).join("");
+ $("polAct").innerHTML=t.policyUrl?'<a class="btn" href="'+esc(safeUrl(t.policyUrl))+'" target="_blank" rel="noopener">Read →</a>':'';
+ if(h.length){$("holdWrap").hidden=false;$("holdings").innerHTML='<table><thead><tr><th>Product</th><th>Serial</th><th>Authentication</th><th>Cost</th><th>Purchased</th><th>Proof</th></tr></thead><tbody>'+h.map(function(x){return '<tr><td>'+esc(x.name||"")+'</td><td>'+esc(x.serial||"")+'</td><td>'+esc(x.auth||"")+'</td><td>'+usd(+x.cost||0)+'</td><td>'+esc(x.date||"")+'</td><td>'+(x.proofUrl?lnk("View",x.proofUrl):"")+'</td></tr>'}).join("")+'</tbody></table>'}
+ var tw=safeUrl(c.links.twitter);if(tw){$("twLink").href=tw;$("twLink").hidden=false}else $("infoLab").hidden=true}
+
+/* ---- models ---- */
+function fees(){var v=+$("fV").value,f=+$("fF").value,s=+$("fS").value;$("oV").textContent=usd(v);$("oF").textContent=f+"%";$("oS").textContent=s+"%";
+ var m=v*30*(f/100)*(s/100);$("fOut").innerHTML=usd(m)+" / month<small>About "+(m/2500).toFixed(2)+" Evolving Skies boxes or "+(m/160).toFixed(1)+" Champion's Path ETBs.</small>"}
+function model(){var n=+$("mU").value,a=+$("mA").value/100,y=+$("mY").value;$("oU").textContent=n.toLocaleString("en-US");$("oA").textContent=(a*100).toFixed(1)+"%";$("oY").textContent=y;
+ var left=Math.round(n*Math.pow(1-a,y));$("mOut").innerHTML=left.toLocaleString("en-US")+" left<small>"+(100-Math.round(left/n*100))+"% gone after "+y+" years. Never higher than the year before.</small>";
+ var L=44,R=580,T=16,B=204,pts=[],k;for(k=0;k<=30;k++)pts.push((L+(R-L)*k/30).toFixed(1)+","+(B-(B-T)*Math.pow(1-a,k)).toFixed(1));
+ var mx=L+(R-L)*y/30,my=B-(B-T)*Math.pow(1-a,y);
+ $("mChart").innerHTML='<line x1="'+L+'" y1="'+B+'" x2="'+R+'" y2="'+B+'" stroke="#34322c"/><polyline points="'+pts.join(" ")+'" fill="none" stroke="#f2efe8" stroke-width="2.5"/><line x1="'+mx+'" y1="'+my+'" x2="'+mx+'" y2="'+B+'" stroke="#a19d93" stroke-dasharray="3 4"/><circle cx="'+mx+'" cy="'+my+'" r="5" fill="#a9c49a"/><text x="'+(mx+8)+'" y="'+(my-8)+'" fill="#f2efe8" font-size="12">Now +'+y+'y</text><text x="'+L+'" y="'+(B+22)+'" fill="#a19d93" font-size="12">Today</text><text x="'+R+'" y="'+(B+22)+'" text-anchor="end" fill="#a19d93" font-size="12">30 years</text>'}
+["fV","fF","fS"].forEach(function(id){$(id).addEventListener("input",fees)});
+["mU","mA","mY"].forEach(function(id){$(id).addEventListener("input",model)});
+
+/* ---- Solana wallets: Wallet Standard discovery + Phantom fallback ---- */
+var W={list:[],wallet:null,legacy:null,addr:""};
+var wsApi={register:function(){[].slice.call(arguments).forEach(function(w){if(w&&w.features&&w.features["standard:connect"]&&(w.chains||[]).some(function(c){return String(c).indexOf("solana:")===0})&&W.list.indexOf(w)<0)W.list.push(w)});return function(){}}};
+window.addEventListener("wallet-standard:register-wallet",function(e){try{e.detail(wsApi)}catch(x){}});
+try{window.dispatchEvent(new CustomEvent("wallet-standard:app-ready",{detail:wsApi}))}catch(x){}
+function legacyProv(){var p=(window.phantom&&window.phantom.solana)||window.solana;return p&&p.connect?p:null}
+function openPicker(){var el=$("wlist"),h="",lp=legacyProv();
+ W.list.forEach(function(w,i){var ic=/^data:image\//.test(w.icon||"")?'<img src="'+esc(w.icon)+'" alt="">':'<span style="width:28px"></span>';h+='<button data-i="'+i+'">'+ic+esc(w.name||"Wallet")+'</button>'});
+ if(!W.list.length&&lp)h+='<button data-l="1"><span style="width:28px;text-align:center">👻</span>Phantom</button>';
+ if(!h)h='<p class="mut" style="margin:0">No Solana wallet found in this browser. <a href="https://phantom.com" target="_blank" rel="noopener">Install Phantom ↗</a></p>';
+ el.innerHTML=h;[].forEach.call(el.querySelectorAll("button"),function(b){b.addEventListener("click",function(){if(b.dataset.l)connectLegacy(lp);else connectStd(W.list[+b.dataset.i])})});$("wdlg").showModal()}
+function connectStd(w){w.features["standard:connect"].connect().then(function(r){var a=(r&&r.accounts&&r.accounts[0])||(w.accounts&&w.accounts[0]);if(!a)throw 0;W.wallet=w;setAddr(a.address)}).catch(function(){note("Connection was cancelled.")})}
+function connectLegacy(p){p.connect().then(function(r){W.legacy=p;setAddr((r&&r.publicKey?r.publicKey:p.publicKey).toString())}).catch(function(){note("Connection was cancelled.")})}
+function note(t){$("wcard").textContent=t}
+function setAddr(a){if(typeof solanaWeb3!=="undefined"){try{a=new solanaWeb3.PublicKey(a).toBase58()}catch(x){note("That wallet returned an invalid address.");return}}
+ W.addr=a;$("wdlg").close();$("wbtn").textContent=short(a);$("wbtn2").textContent="Connected";note("Connected: "+short(a)+".");balance()}
+function balance(){var m=CONFIG.token.mint;if(!m||typeof solanaWeb3==="undefined"||!W.addr)return;
+ try{var c=new solanaWeb3.Connection(CONFIG.rpc,"confirmed");c.getParsedTokenAccountsByOwner(new solanaWeb3.PublicKey(W.addr),{mint:new solanaWeb3.PublicKey(m)}).then(function(r){var s=0;r.value.forEach(function(v){s+=v.account.data.parsed.info.tokenAmount.uiAmount||0});note("Connected: "+short(W.addr)+". Balance: "+s.toLocaleString("en-US")+" $SEALED.")}).catch(function(){})}catch(x){}}
+function disconnect(){try{if(W.wallet&&W.wallet.features["standard:disconnect"])W.wallet.features["standard:disconnect"].disconnect();if(W.legacy&&W.legacy.disconnect)W.legacy.disconnect()}catch(x){}
+ W.wallet=W.legacy=null;W.addr="";$("wbtn").textContent="Connect wallet";$("wbtn2").textContent="Connect →";note("Connect Phantom or another Solana wallet to see your $SEALED position.");$("wmenu").hidden=true}
+$("wbtn").addEventListener("click",function(){if(W.addr)$("wmenu").hidden=!$("wmenu").hidden;else openPicker()});
+$("wbtn2").addEventListener("click",function(){if(!W.addr)openPicker()});
+$("wdis").addEventListener("click",disconnect);
+$("wcopy").addEventListener("click",function(){try{navigator.clipboard.writeText(W.addr)}catch(x){}$("wmenu").hidden=true});
+$("wclose").addEventListener("click",function(){$("wdlg").close()});
+$("discBtn").addEventListener("click",function(){$("ddlg").showModal()});$("dclose").addEventListener("click",function(){$("ddlg").close()});
+
+/* ---- router ---- */
+var names={home:"Home",treasury:"Treasury",catalog:"Catalog",supply:"Supply",economics:"Economics",protocol:"Protocol"};
+function route(){var p=(location.hash||"").replace(/^#\/?/,"")||"home";if(!names[p])p="home";
+ [].forEach.call(document.querySelectorAll(".page"),function(x){x.classList.toggle("on",x.id==="p-"+p)});
+ [].forEach.call(document.querySelectorAll("#nav a"),function(a){if(a.dataset.p===p)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
+ $("crumb").textContent=names[p];window.scrollTo(0,0)}
+window.addEventListener("hashchange",route);
+treasury();fees();model();grid();route();
+</script>
+</body>
+</html>
